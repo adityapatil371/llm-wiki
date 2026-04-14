@@ -1,0 +1,9 @@
+# Gradient Boosting
+**What it is:** An ensemble machine learning technique that builds a predictive model in a stage-wise fashion. It combines an ensemble of weak prediction models, typically decision trees, to create a strong predictor.
+**How it works:** It iteratively trains new models to predict the residuals (errors) of the previous models. Each new model is trained to minimize a specific loss function by moving in the direction of its negative gradient. The predictions of all weak learners are then summed up to make the final, more accurate prediction.
+**The 20%:** An iterative ensemble method where new models are added sequentially to correct the errors of previous models, effectively boosting overall performance by focusing on misclassified instances. It works by minimizing a loss function via gradient descent.
+**Concrete example:** In a credit risk assessment system, the first tree might capture broad patterns, and subsequent trees would learn to correct the errors for specific applicants that the previous trees misjudged, refining the overall risk prediction.
+**Common mistake:** Overfitting if not properly regularized or if the learning rate is too high and the number of estimators is too large. It can also be computationally intensive for very large datasets if not implemented efficiently (e.g., without optimizations like those in XGBoost).
+**Interview answer (30 seconds):** "Gradient Boosting is a powerful ensemble machine learning technique that builds a strong predictive model by sequentially adding weak learners, typically decision trees. Each new tree learns to correct the errors, or residuals, of the previous ensemble, minimizing a loss function through gradient descent. Algorithms like XGBoost are highly optimized implementations of this concept, known for their exceptional accuracy."
+**Source:** test_doc.txt
+**Related:** [[xgboost]], [[ensemble_learning]], [[decision_tree]], [[machine_learning_models]]
