@@ -1,0 +1,7 @@
+langchain-google-genai==2.1.4
+langchain-groq==0.2.1
+langchain-core>=0.3.52
+streamlit==1.40.1
+python-dotenv==1.0.1
+gitpython==3.1.43
+pyvis==0.3.2
