@@ -1,5 +1,5 @@
 # Models
-INGEST_MODEL = "gemini-2.5-flash-preview-04-17"
+INGEST_MODEL = "gemini-2.5-flash"
 QUERY_MODEL = "llama-3.1-8b-instant"
 
 # Paths

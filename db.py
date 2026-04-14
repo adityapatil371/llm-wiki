@@ -2,7 +2,7 @@ import sqlite3
 import hashlib
 from datetime import datetime
 from config import DB_PATH
-
+from pathlib import Path
 
 def get_connection():
     """Get a SQLite connection. Creates the DB file if it doesn't exist."""
@@ -30,18 +30,29 @@ def hash_file(file_bytes: bytes) -> str:
 
 def is_already_ingested(document_name: str, file_hash: str) -> bool:
     """
-    Returns True if this exact version of the document
-    has already been ingested (same name AND same hash).
+    Returns True only if:
+    1. Document hash matches (same version)
+    2. All wiki pages created from it still exist on disk
     """
     with get_connection() as conn:
         row = conn.execute("""
-            SELECT file_hash FROM ingestion_index
+            SELECT file_hash, wiki_pages FROM ingestion_index
             WHERE document_name = ?
         """, (document_name,)).fetchone()
 
     if row is None:
-        return False  # never seen this document
-    return row[0] == file_hash  # seen it, but has it changed?
+        return False
+
+    if row[0] != file_hash:
+        return False  # document has changed, re-ingest
+
+    # verify wiki pages still exist
+    wiki_pages = row[1].split(",") if row[1] else []
+    for page in wiki_pages:
+        if page and not Path(page).exists():
+            return False  # page was deleted, re-ingest
+
+    return True
 
 
 def record_ingestion(document_name: str, file_hash: str, wiki_pages: list[str]):
