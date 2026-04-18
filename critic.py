@@ -81,6 +81,22 @@ def deterministic_checks(pages: dict[str, str]) -> list[str]:
         if len(content) < 200:
             issues.append(f"{filename}: suspiciously short ({len(content)} chars) — likely incomplete")
 
+    # Check concrete example is actually concrete
+    example_start = content.find("**Concrete example:**")
+    if example_start != -1:
+        example_line = content[example_start:example_start + 150]
+        vague_phrases = [
+            "works well on",
+            "can be used for",
+            "is useful for",
+            "is effective for",
+            "is commonly used"
+        ]
+        for phrase in vague_phrases:
+            if phrase.lower() in example_line.lower():
+                issues.append(
+                    f"{filename}: concrete example is too vague ('{phrase}') — needs specific numbers or code"
+                )
     return issues
 
 def critique_pages(pages, source_bytes, filename) -> dict:
