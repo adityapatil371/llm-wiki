@@ -66,13 +66,9 @@ def fetch_url_content(url: str) -> dict:
 
 
 def fetch_youtube_transcript(url: str) -> dict:
-    """
-    Download YouTube transcript using yt-dlp.
-    Returns {"content": str, "filename": str, "type": str}
-    """
     with tempfile.TemporaryDirectory() as tmpdir:
         output_template = os.path.join(tmpdir, "transcript")
-
+        
         result = subprocess.run([
             "yt-dlp",
             "--write-auto-sub",
@@ -90,14 +86,12 @@ def fetch_youtube_transcript(url: str) -> dict:
                 "error": f"yt-dlp failed: {result.stderr[:200]}"
             }
 
-        # find the downloaded .srt file
         srt_files = list(Path(tmpdir).glob("*.srt"))
         if not srt_files:
             return {"content": None, "error": "No transcript found for this video"}
 
         raw_srt = srt_files[0].read_text(encoding="utf-8", errors="ignore")
 
-        # clean SRT format — remove timestamps and indices, keep text only
         clean_lines = []
         for line in raw_srt.split("\n"):
             line = line.strip()
@@ -107,19 +101,19 @@ def fetch_youtube_transcript(url: str) -> dict:
                 continue
             if "-->" in line:
                 continue
-            # remove HTML tags from auto-captions
             line = re.sub(r"<[^>]+>", "", line)
             if line:
                 clean_lines.append(line)
 
         content = " ".join(clean_lines)
 
-        # derive filename from video title if possible
-        title_match = re.search(r"Destination: (.+?)\.srt", result.stdout)
-        filename = "youtube_transcript.txt"
+        video_id = url.split("v=")[-1].split("&")[0] if "v=" in url else "youtube"
+        filename = f"yt_{video_id}.txt"
+
+        title_match = re.search(r'\[download\] Destination: (.+?)\.', result.stdout)
         if title_match:
             raw_title = Path(title_match.group(1)).name
-            filename = re.sub(r"[^\w\s-]", "", raw_title).strip().replace(" ", "_") + ".txt"
+            filename = re.sub(r'[^\w\s-]', '', raw_title).strip().replace(' ', '_')[:50] + ".txt"
 
         return {
             "content": content,
