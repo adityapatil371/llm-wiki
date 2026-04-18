@@ -135,21 +135,30 @@ IMPORTANT RULES:
 - It is better to create one complete page than five incomplete ones.
 - [[related_concept]] links are just references — do not create pages for them.
 - Concrete examples must come directly from the source document, never invented.
+- Every field MUST use exactly this bold format: **Field name:** content
+- Do NOT write fields as plain text like "What it is:" — always use **What it is:**
+- Copy the field names exactly as shown — no variations, no shortcuts
 
 INSTRUCTIONS:
 Extract the core 20% of concepts from the source document.
-For each concept you have COMPLETE information for, produce a wiki page in this exact format:
+For each concept you have COMPLETE information for, produce a wiki page.
+
+YOU MUST USE THIS EXACT FORMAT — NO EXCEPTIONS:
 
 FILE: concept_name.md
 # Concept Name
-**What it is:** ...
-**How it works:** ...
-**The 20%:** ...
-**Concrete example:** ...
-**Common mistake:** ...
-**Interview answer (30 seconds):** ...
+**What it is:** [one sentence, plain English]
+**How it works:** [the mechanism, simple enough for a non-technical person]
+**The 20%:** [minimum needed to use this correctly]
+**Concrete example:** [must be directly from the source document, not invented]
+**Common mistake:** [one specific way people get this wrong]
+**Interview answer (30 seconds):** [plain English, something you could say out loud]
 **Source:** {filename}
 **Related:** [[related_concept]]
+
+DO NOT write prose. DO NOT summarise in paragraphs. 
+ONLY use the FILE: block format above.
+Every single field must start with ** and end with :** followed by content.
 
 Produce one FILE: block per concept. Use lowercase_with_underscores for filenames.
 After all FILE: blocks, add a SUMMARY: section listing:
@@ -204,10 +213,6 @@ def ingest_document(file_bytes: bytes, filename: str) -> dict:
     # Step 5 — call ingestion agent
     response_text = invoke_with_fallback(message)
 
-    # DEBUG — remove after confirmed working
-    print("=== AGENT RESPONSE (first 500 chars) ===")
-    print(response_text[:500])
-    print("=== END ===")
 
     # Step 6 — parse pages
     pages = parse_agent_response(response_text)

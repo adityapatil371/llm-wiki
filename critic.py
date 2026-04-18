@@ -47,8 +47,25 @@ def deterministic_checks(pages: dict[str, str]) -> list[str]:
     Returns list of issues found.
     """
     issues = []
-    
+
     for filename, content in pages.items():
+        # Check for prose paragraphs instead of structured fields
+        lines = content.split("\n")
+        prose_lines = [
+            l for l in lines
+            if len(l) > 80
+            and not l.startswith("**")
+            and not l.startswith("#")
+            and not l.startswith(">")
+            and not l.startswith("-")
+            and not l.startswith("*")
+            and l.strip()
+        ]
+        if len(prose_lines) > 2:
+            issues.append(
+                f"{filename}: contains prose paragraphs instead of structured fields — agent ignored format"
+            )
+
         # Check for explicit "not provided" admissions
         not_provided_phrases = [
             "not provided in source",
@@ -79,24 +96,27 @@ def deterministic_checks(pages: dict[str, str]) -> list[str]:
 
         # Check page isn't suspiciously short
         if len(content) < 200:
-            issues.append(f"{filename}: suspiciously short ({len(content)} chars) — likely incomplete")
+            issues.append(
+                f"{filename}: suspiciously short ({len(content)} chars) — likely incomplete"
+            )
 
-    # Check concrete example is actually concrete
-    example_start = content.find("**Concrete example:**")
-    if example_start != -1:
-        example_line = content[example_start:example_start + 150]
-        vague_phrases = [
-            "works well on",
-            "can be used for",
-            "is useful for",
-            "is effective for",
-            "is commonly used"
-        ]
-        for phrase in vague_phrases:
-            if phrase.lower() in example_line.lower():
-                issues.append(
-                    f"{filename}: concrete example is too vague ('{phrase}') — needs specific numbers or code"
-                )
+        # Check concrete example is actually concrete
+        example_start = content.find("**Concrete example:**")
+        if example_start != -1:
+            example_line = content[example_start:example_start + 150]
+            vague_phrases = [
+                "works well on",
+                "can be used for",
+                "is useful for",
+                "is effective for",
+                "is commonly used"
+            ]
+            for phrase in vague_phrases:
+                if phrase.lower() in example_line.lower():
+                    issues.append(
+                        f"{filename}: concrete example is too vague ('{phrase}') — needs specific numbers or code"
+                    )
+
     return issues
 
 def critique_pages(pages, source_bytes, filename) -> dict:
