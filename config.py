@@ -1,5 +1,6 @@
 # Models
 INGEST_MODEL = "gemini-2.5-flash"
+INGEST_MODEL_FALLBACK = "gemini-2.0-flash"
 QUERY_MODEL = "llama-3.1-8b-instant"
 
 # Paths
